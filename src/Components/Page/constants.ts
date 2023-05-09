@@ -1,5 +1,7 @@
 export type Combatant = {
   name: string,
+  id: string,
+  color: "neutral" | "blue" | "red" | "orange" | "yellow" | "green" | "teal" | "purple" | undefined,
   stats: {
     hp: {
       max: number,
@@ -34,6 +36,8 @@ export type Combatant = {
 
 export const combatant1: Combatant = {
   name: 'Player 1',
+  id: '1',
+  color: 'blue',
   stats: {
     hp: {
       max: 100,
@@ -52,12 +56,12 @@ export const combatant1: Combatant = {
       current: 100,
     },
     stamina: {
-      max: 3,
-      current: 3,
+      max: 5,
+      current: 5,
     },
     accuracy: {
-      max: 10,
-      current: 10,
+      max: 8,
+      current: 8,
     },
     evasion: {
       max: 5,
@@ -68,6 +72,8 @@ export const combatant1: Combatant = {
 
 export const combatant2: Combatant = {
   name: 'Player 2',
+  id: '2',
+  color: 'red',
   stats: {
     hp: {
       max: 80,
@@ -78,16 +84,16 @@ export const combatant2: Combatant = {
       current: 4,
     },
     defence: {
-      max: 1,
-      current: 1,
+      max: 2,
+      current: 2,
     },
     speed: {
       max: 120,
       current: 120,
     },
     stamina: {
-      max: 3,
-      current: 3,
+      max: 4,
+      current: 4,
     },
     accuracy: {
       max: 5,

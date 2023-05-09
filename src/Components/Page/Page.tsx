@@ -1,5 +1,5 @@
-import { Pane } from "evergreen-ui";
-import { Combatant } from "./Components";
+import { Button, Card, Pane } from "evergreen-ui";
+import { ActionButtons, Combatant, TurnOrder } from "./Components";
 import { combatant1, combatant2 } from "./constants";
 
 export function Page() {
@@ -15,9 +15,16 @@ export function Page() {
       backgroundPosition="center"
       backgroundRepeat="repeat-xy"
     >
-      <Combatant combatant={combatant1}/>
-      <Pane padding={64} />
-      <Combatant combatant={combatant2}/>
+      <Pane display="flex" flexDirection="column" alignItems="center">
+        <Pane display="flex">
+          <Combatant combatant={combatant1}/>
+          <Pane padding={64} />
+          <Combatant combatant={combatant2}/>
+        </Pane>
+        <TurnOrder combatant1={combatant1} combatant2={combatant2} />
+        <Pane padding={16} />
+        <ActionButtons combatant1={combatant1} />
+      </Pane>
     </Pane>
   )
 }
