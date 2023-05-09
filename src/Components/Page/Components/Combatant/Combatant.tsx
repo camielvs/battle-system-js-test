@@ -17,8 +17,8 @@ export function Combatant({combatant}: Props) {
       </Card>
       <Card display="flex" flexDirection="column" padding={8} margin={8} background="tint2" justifyContent="center">
         <HealthBar currentHealth={hp.current} maxHealth={hp.max} />
-        <Strong>{`Health: ${hp.current}/${hp.max}`}</Strong>
         <Pane marginY={4} border='muted'/>
+        <Strong>Stats</Strong>
         <Text>{`Attack: ${attack.current}`}</Text>
         <Text>{`Defence: ${defence.current}`}</Text>
         <Text>{`Speed: ${speed.current}`}</Text>

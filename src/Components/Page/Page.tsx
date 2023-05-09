@@ -18,11 +18,12 @@ export function Page() {
       <Pane display="flex" flexDirection="column" alignItems="center">
         <Pane display="flex">
           <Combatant combatant={combatant1}/>
-          <Pane padding={64} />
+          <Pane padding={128} />
           <Combatant combatant={combatant2}/>
         </Pane>
+        <Pane padding={8} />
         <TurnOrder combatant1={combatant1} combatant2={combatant2} />
-        <Pane padding={16} />
+        <Pane padding={8} />
         <ActionButtons combatant1={combatant1} />
       </Pane>
     </Pane>

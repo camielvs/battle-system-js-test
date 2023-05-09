@@ -1,11 +1,11 @@
-import { Pane } from 'evergreen-ui'
+import { Pane, Small, Strong } from 'evergreen-ui'
 
 interface Props {
   currentHealth: number,
   maxHealth: number
 }
 
-export function HealthBar({currentHealth,maxHealth}: Props) {
+export function HealthBar({currentHealth, maxHealth}: Props) {
   const healthPercent = currentHealth/maxHealth * 100;
   const healthBarColor = getHealthBarColor(healthPercent);
   
@@ -16,10 +16,11 @@ export function HealthBar({currentHealth,maxHealth}: Props) {
     return 'gray900';
   }
   return (
-    <Pane padding={4}>
-      <Pane width={100} height={10} border='default'>
+    <Pane display="flex" padding={4} alignItems="center">
+      <Pane width={100} height={10} border='default' marginRight={4}>
         <Pane width={Math.ceil(healthPercent)} height={10} background={healthBarColor} />
       </Pane>
+      <Strong><Small>{`${currentHealth}/${maxHealth}`}</Small></Strong>
     </Pane>
   )
 }

@@ -1,4 +1,4 @@
-import { Button, Card, Heading, Pane, StatusIndicator } from 'evergreen-ui'
+import { Button, Card, Heading, Pane, StatusIndicator, Tooltip } from 'evergreen-ui'
 import { Combatant } from '../../constants'
 
 interface Props {
@@ -18,20 +18,30 @@ export function ActionButtons({combatant1}: Props) {
       </Pane>
       <Heading padding={8}>Choose your actions for this round</Heading>
       <Pane justifyContent="center">
-        <Button margin={8}>
-          <StatusIndicator color="warning">Attack</StatusIndicator>
-        </Button>
+        <Tooltip content="Deal Damage">
+          <Button margin={8}>
+            <StatusIndicator color="warning">Attack</StatusIndicator>
+          </Button>
+        </Tooltip>
+        <Tooltip content="+5 Defence">
         <Button margin={8}>
           <StatusIndicator color="warning">Defend</StatusIndicator>
         </Button>
-        <Button margin={8}>
-          <StatusIndicator color="warning">Study</StatusIndicator>
-        </Button>
-        <Button margin={8}>
-          <StatusIndicator color="warning" />
-          <StatusIndicator color="warning">Special Attack</StatusIndicator>
-        </Button>
+        </Tooltip>
+        <Tooltip content="+5 Accuracy, +5 Evasion">
+          <Button margin={8}>
+            <StatusIndicator color="warning">Study</StatusIndicator>
+          </Button>
+        </Tooltip>
+        <Tooltip content="+50% Attack, Ignore Defence">
+          <Button margin={8}>
+            <StatusIndicator color="warning" />
+            <StatusIndicator color="warning">Special Attack</StatusIndicator>
+          </Button>
+        </Tooltip>
       </Pane>
+      <Pane margin={8} />
+      <Button appearance='primary'>Confirm</Button>
     </Card>
   )
 }
