@@ -1,0 +1,1 @@
+export {Combatant} from './Combatant'
