@@ -1,9 +1,13 @@
-import { Button, Card, Pane } from "evergreen-ui";
+import { Pane } from "evergreen-ui";
 import { ActionButtons, Combatant, TurnOrder } from "./Components";
-import { combatant1, combatant2 } from "./constants";
+import { combatant1Base, combatant2Base } from "./constants";
+import { useState } from "react";
 
 export function Page() {
-  
+  const [combatant1, setCombatant1] = useState(combatant1Base);
+  const [combatant2, setCombatant2] = useState(combatant2Base);
+
+
   return (
     <Pane 
       height="100vh"

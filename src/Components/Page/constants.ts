@@ -34,7 +34,7 @@ export type Combatant = {
   }
 }
 
-export const combatant1: Combatant = {
+export const combatant1Base: Combatant = {
   name: 'Player 1',
   id: '1',
   color: 'blue',
@@ -70,7 +70,7 @@ export const combatant1: Combatant = {
   }
 }
 
-export const combatant2: Combatant = {
+export const combatant2Base: Combatant = {
   name: 'Player 2',
   id: '2',
   color: 'red',
