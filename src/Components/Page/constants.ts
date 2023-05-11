@@ -1,43 +1,52 @@
 export type Combatant = {
-  name: string,
-  id: string,
-  color: "neutral" | "blue" | "red" | "orange" | "yellow" | "green" | "teal" | "purple" | undefined,
+  name: string;
+  id: string;
+  color:
+    | "neutral"
+    | "blue"
+    | "red"
+    | "orange"
+    | "yellow"
+    | "green"
+    | "teal"
+    | "purple"
+    | undefined;
   stats: {
     hp: {
-      max: number,
-      current: number,
-    },
+      max: number;
+      current: number;
+    };
     attack: {
-      max: number,
-      current: number,
-    },
+      max: number;
+      current: number;
+    };
     defence: {
-      max: number,
-      current: number,
-    },
+      max: number;
+      current: number;
+    };
     speed: {
-      max: number,
-      current: number,
-    },
+      max: number;
+      current: number;
+    };
     stamina: {
-      max: number,
-      current: number,
-    },
+      max: number;
+      current: number;
+    };
     accuracy: {
-      max: number,
-      current: number,
-    },
+      max: number;
+      current: number;
+    };
     evasion: {
-      max: number,
-      current: number,
-    }
-  }
-}
+      max: number;
+      current: number;
+    };
+  };
+};
 
 export const combatant1Base: Combatant = {
-  name: 'Player 1',
-  id: '1',
-  color: 'blue',
+  name: "Player 1",
+  id: "1",
+  color: "blue",
   stats: {
     hp: {
       max: 100,
@@ -66,14 +75,14 @@ export const combatant1Base: Combatant = {
     evasion: {
       max: 5,
       current: 5,
-    }
-  }
-}
+    },
+  },
+};
 
 export const combatant2Base: Combatant = {
-  name: 'Player 2',
-  id: '2',
-  color: 'red',
+  name: "Player 2",
+  id: "2",
+  color: "red",
   stats: {
     hp: {
       max: 80,
@@ -102,6 +111,6 @@ export const combatant2Base: Combatant = {
     evasion: {
       max: 3,
       current: 3,
-    }
-  }
-}
+    },
+  },
+};

@@ -1,23 +1,37 @@
 import { Avatar, Card, Heading, Pane, Strong, Text } from "evergreen-ui";
-import type {Combatant} from '../../constants'
+import type { Combatant } from "../../constants";
 import { HealthBar } from "./Components";
 import { useState } from "react";
 
 interface Props {
   combatant: Combatant;
 }
-export function Combatant({combatant}: Props) {
-  const [stats, setStats] = useState(combatant.stats)
-  const {hp, attack, defence, speed, stamina, accuracy, evasion} = stats;
+export function Combatant({ combatant }: Props) {
+  const [stats, setStats] = useState(combatant.stats);
+  const { hp, attack, defence, speed, stamina, accuracy, evasion } = stats;
   return (
     <Pane display="flex" flexDirection="column" alignItems="center" margin={16}>
-      <Avatar name={combatant.name} size={210} color={combatant.color}/>
-      <Card display="flex" padding={8} margin={8} background="tint2" elevation={1} justifyContent="center">
+      <Avatar name={combatant.name} size={210} color={combatant.color} />
+      <Card
+        display="flex"
+        padding={8}
+        margin={8}
+        background="tint2"
+        elevation={1}
+        justifyContent="center"
+      >
         <Heading>{combatant.name}</Heading>
       </Card>
-      <Card display="flex" flexDirection="column" padding={8} margin={8} background="tint2" justifyContent="center">
+      <Card
+        display="flex"
+        flexDirection="column"
+        padding={8}
+        margin={8}
+        background="tint2"
+        justifyContent="center"
+      >
         <HealthBar currentHealth={hp.current} maxHealth={hp.max} />
-        <Pane marginY={4} border='muted'/>
+        <Pane marginY={4} border="muted" />
         <Strong>Stats</Strong>
         <Text>{`Attack: ${attack.current}`}</Text>
         <Text>{`Defence: ${defence.current}`}</Text>
@@ -27,5 +41,5 @@ export function Combatant({combatant}: Props) {
         <Text>{`Evasion: ${evasion.current}`}</Text>
       </Card>
     </Pane>
-  )
+  );
 }

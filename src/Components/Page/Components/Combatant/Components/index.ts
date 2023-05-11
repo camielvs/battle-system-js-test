@@ -1,1 +1,1 @@
-export {HealthBar} from './HealthBar'
+export { HealthBar } from "./HealthBar";

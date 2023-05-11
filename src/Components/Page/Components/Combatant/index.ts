@@ -1,1 +1,1 @@
-export {Combatant} from './Combatant'
+export { Combatant } from "./Combatant";
