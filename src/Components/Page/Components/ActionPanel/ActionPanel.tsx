@@ -1,37 +1,14 @@
 import { Button, Card, Heading, Pane } from "evergreen-ui";
-import { Combatant } from "../../constants";
+import { ACTIONS, Combatant, SKIPTURN } from "../../constants";
 import { useState } from "react";
 import { ActionButton } from "./Components";
 
 interface Props {
   combatant1: Combatant;
+  onConfirm: (actions: string[]) => void;
 }
 
-const SKIPTURN = "-";
-const ACTIONS = {
-  attack: {
-    name: "Attack",
-    tip: "Deal Damage",
-    cost: 1,
-  },
-  defend: {
-    name: "Defend",
-    tip: "+5 Defence until next action",
-    cost: 1,
-  },
-  study: {
-    name: "Study",
-    tip: "+5 Accuracy, +5 Evasion until end of round",
-    cost: 1,
-  },
-  special: {
-    name: "Special Attack",
-    tip: "+50% Attack, Ignore Defence",
-    cost: 2,
-  },
-};
-
-export function ActionPanel({ combatant1 }: Props) {
+export function ActionPanel({ combatant1, onConfirm }: Props) {
   const [chosenActions, setChosenActions] = useState([] as string[]);
 
   const stamina = combatant1.stats.stamina.max;
@@ -99,7 +76,10 @@ export function ActionPanel({ combatant1 }: Props) {
       <Pane display="flex" justifyContent="center">
         <Button
           appearance="primary"
-          onClick={() => console.log(chosenActions)}
+          onClick={() => {
+            onConfirm(chosenActions);
+            setChosenActions([]);
+          }}
           disabled={chosenActions.length !== stamina}
         >
           Confirm

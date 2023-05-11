@@ -114,3 +114,31 @@ export const combatant2Base: Combatant = {
     },
   },
 };
+
+export const SKIPTURN = "-";
+export const ACTIONS = {
+  attack: {
+    name: "Attack",
+    tip: "Deal Damage",
+    cost: 1,
+    weight: 5,
+  },
+  defend: {
+    name: "Defend",
+    tip: "+5 Defence until next action",
+    cost: 1,
+    weight: 4,
+  },
+  study: {
+    name: "Study",
+    tip: "+5 Accuracy, +5 Evasion until end of round",
+    cost: 1,
+    weight: 3,
+  },
+  special: {
+    name: "Special Attack",
+    tip: "+50% Attack, Ignore Defence",
+    cost: 2,
+    weight: 2,
+  },
+};

@@ -6,7 +6,7 @@ import { useState } from "react";
 interface Props {
   combatant: Combatant;
 }
-export function Combatant({ combatant }: Props) {
+export function CombatantUI({ combatant }: Props) {
   const [stats, setStats] = useState(combatant.stats);
   const { hp, attack, defence, speed, stamina, accuracy, evasion } = stats;
   return (
