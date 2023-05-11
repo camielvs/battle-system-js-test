@@ -12,8 +12,8 @@ export function TurnOrder({ combatant1, combatant2 }: Props) {
 
   const turnOrder = c1spd.concat(c2spd).sort((a, b) => b.speed - a.speed);
 
-  const turnOrderMarkup = turnOrder.map((spd) => (
-    <Badge color={spd.color} margin={8}>
+  const turnOrderMarkup = turnOrder.map((spd, i) => (
+    <Badge color={spd.color} margin={8} key={`${i}-P${spd.combatant}`}>
       <Text>{`P${spd.combatant}`}</Text>
     </Badge>
   ));

@@ -52,6 +52,7 @@ export function ActionButtons({ combatant1 }: Props) {
       display="flex"
       justifyContent="center"
       alignItems="center"
+      key={i}
     >
       {i < chosenActions.length ? chosenActions[i].substring(0, 2) : null}
     </Pane>
@@ -68,13 +69,9 @@ export function ActionButtons({ combatant1 }: Props) {
   function updateActions(e: any) {
     if (!chosenActions || chosenActions.length >= stamina) return;
 
-    const target =
-      e.target.nodeName === "SPAN"
-        ? e.target
-        : e.target.parentNode.parentNode.parentNode.lastChild;
+    const target = getTargetButton(e.target) as HTMLElement;
+    if (!target) return;
     const action = target.outerText;
-
-    console.log(target); //wrong if clicking on button, not text. need to add workaround but zzz for now.
 
     if (action) {
       if (action === ACTIONS.special.name) {
@@ -85,6 +82,17 @@ export function ActionButtons({ combatant1 }: Props) {
         setChosenActions([...chosenActions, action]);
       }
     }
+  }
+
+  function getTargetButton(target: HTMLElement) {
+    if (target.nodeName.toLowerCase() === "span") return target; //Clicked the text in the button
+    if (target.nodeName.toLowerCase() === "button") return target.lastChild; //Clicked the whitespace in the button
+    if (target.nodeName.toLowerCase() === "svg")
+      return target.parentNode!.parentNode!.lastChild; //Clicked the svg in the button
+    if (target.nodeName.toLowerCase() === "path")
+      return target.parentNode!.parentNode!.parentNode!.lastChild; //Clicked the circle in the button
+
+    return null;
   }
 
   return (
