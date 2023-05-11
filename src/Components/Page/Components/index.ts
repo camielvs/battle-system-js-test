@@ -1,3 +1,3 @@
 export { Combatant } from "./Combatant";
-export { ActionButtons } from "./ActionButtons";
+export { ActionPanel } from "./ActionPanel";
 export { TurnOrder } from "./TurnOrder";

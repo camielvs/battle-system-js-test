@@ -1,5 +1,5 @@
 import { Pane } from "evergreen-ui";
-import { ActionButtons, Combatant, TurnOrder } from "./Components";
+import { ActionPanel, Combatant, TurnOrder } from "./Components";
 import { combatant1Base, combatant2Base } from "./constants";
 import { useState } from "react";
 
@@ -27,7 +27,7 @@ export function Page() {
         <Pane padding={8} />
         <TurnOrder combatant1={combatant1} combatant2={combatant2} />
         <Pane padding={8} />
-        <ActionButtons combatant1={combatant1} />
+        <ActionPanel combatant1={combatant1} />
       </Pane>
     </Pane>
   );
