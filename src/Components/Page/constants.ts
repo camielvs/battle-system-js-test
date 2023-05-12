@@ -1,16 +1,9 @@
+import { BadgeOwnProps } from "evergreen-ui";
+
 export type Combatant = {
   name: string;
   id: string;
-  color:
-    | "neutral"
-    | "blue"
-    | "red"
-    | "orange"
-    | "yellow"
-    | "green"
-    | "teal"
-    | "purple"
-    | undefined;
+  color: BadgeOwnProps["color"];
   stats: {
     hp: {
       max: number;
@@ -125,13 +118,13 @@ export const ACTIONS = {
   },
   defend: {
     name: "Defend",
-    tip: "+5 Defence until next action",
+    tip: "+5 Defence until your next action",
     cost: 1,
     weight: 4,
   },
   study: {
     name: "Study",
-    tip: "+5 Accuracy, +5 Evasion until end of round",
+    tip: "+5 Accuracy, +5 Evasion for the rest of the round",
     cost: 1,
     weight: 3,
   },
@@ -141,4 +134,17 @@ export const ACTIONS = {
     cost: 2,
     weight: 2,
   },
+};
+
+export type Action = {
+  name: string;
+  tip: string;
+  cost: number;
+  weight: number;
+};
+
+export type TurnOrderData = {
+  combatant: string;
+  speed: number;
+  color: BadgeOwnProps["color"];
 };

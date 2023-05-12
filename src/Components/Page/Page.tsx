@@ -1,13 +1,21 @@
-import { Pane } from "evergreen-ui";
+import { Card, Pane, Text } from "evergreen-ui";
 import { ActionPanel, CombatantUI, TurnOrder } from "./Components";
-import { ACTIONS, combatant1Base, combatant2Base, SKIPTURN } from "./constants";
-import type { Combatant } from "./constants";
+import {
+  Action,
+  ACTIONS,
+  combatant1Base,
+  combatant2Base,
+  SKIPTURN,
+} from "./constants";
+import type { Combatant, TurnOrderData } from "./constants";
 import { useMemo, useState } from "react";
 
 export function Page() {
   const [combatant1, setCombatant1] = useState(combatant1Base);
   const [combatant2, setCombatant2] = useState(combatant2Base);
-  const [turnOrder, setTurnOrder] = useState([] as any[]);
+  const [turnOrder, setTurnOrder] = useState([] as TurnOrderData[]);
+  const [forceRefresh, setForceRefresh] = useState(false); //because I'm lazy
+  const [eventLog, setEventLog] = useState([] as string[]);
 
   useMemo(() => {
     const c1spd = computeSpeedArray(combatant1);
@@ -17,21 +25,118 @@ export function Page() {
     setTurnOrder(turnOrder);
   }, [setTurnOrder]);
 
-  function computeSpeedArray(combatant: Combatant) {
-    const spd = new Array(combatant.stats.stamina.max);
-    spd.fill(combatant.stats.speed.max);
-    return spd.map((v, i) => ({
-      combatant: combatant.id,
-      speed: v * (1 - i / spd.length),
-      color: combatant.color,
-    }));
-  }
-
   function endRound(actions: string[]) {
     const enemyActions = generateEnemyActions(combatant2);
-    console.log(actions, turnOrder);
-    console.log(enemyActions);
+
+    turnOrder.forEach((turn) => {
+      setTimeout(() => {
+        executeAction(turn, actions, enemyActions);
+        setForceRefresh(!forceRefresh);
+      }, 500);
+    });
+
+    // console.log("+--NEW ROUND--+");
+    setTimeout(() => {
+      resetTempStats(combatant1);
+      resetTempStats(combatant2);
+      setForceRefresh(!forceRefresh);
+      // setEventLog("ROUND END");
+    }, 500 * turnOrder.length);
   }
+
+  function resetTempStats(combatant: Combatant) {
+    combatant.stats.attack.current = combatant.stats.attack.max;
+    combatant.stats.defence.current = combatant.stats.defence.max;
+    combatant.stats.speed.current = combatant.stats.speed.max;
+    combatant.stats.accuracy.current = combatant.stats.accuracy.max;
+    combatant.stats.evasion.current = combatant.stats.evasion.max;
+    updateCombatant(combatant);
+  }
+
+  function updateCombatant(combatantData: Combatant) {
+    combatantData.id === "1"
+      ? setCombatant1(combatantData)
+      : setCombatant2(combatantData);
+  }
+
+  function executeAction(turn: any, actions: string[], enemyActions: string[]) {
+    const reversedActionArray = actions.reverse();
+    const reversedEnemyActionArray = enemyActions.reverse();
+
+    const actionArray =
+      turn.combatant === "1" ? reversedActionArray : reversedEnemyActionArray;
+    const action = actionArray.pop();
+
+    if (action === SKIPTURN) return;
+
+    const actor = turn.combatant === "1" ? combatant1 : combatant2;
+    const recipient = actor.id === "1" ? combatant2 : combatant1;
+
+    actor.stats.defence.current = actor.stats.defence.max;
+    updateCombatant(actor);
+
+    const newRecipient = recipient;
+    const damage = actor.stats.attack.current - recipient.stats.defence.current;
+    const dodgeThreshold = Math.max(
+      recipient.stats.evasion.current - actor.stats.accuracy.current,
+      0
+    );
+
+    const message = [];
+    message.push(`Player ${turn.combatant} used ${action}!`);
+
+    switch (action?.toLowerCase()) {
+      case "attack":
+        if (actor.stats.attack.current > dodgeThreshold && damage > 0) {
+          newRecipient.stats.hp.current = Math.max(
+            newRecipient.stats.hp.current - damage,
+            0
+          );
+          message.push(`It did ${damage} damage.`);
+        } else {
+          message.push(`It was dodged or blocked and did no damage.`);
+        }
+
+        updateCombatant(newRecipient);
+        break;
+
+      case "defend":
+        actor.stats.defence.current += 5;
+        updateCombatant(actor);
+        break;
+
+      case "study":
+        actor.stats.accuracy.current += 5;
+        actor.stats.evasion.current += 5;
+        updateCombatant(actor);
+        break;
+
+      case "special attack":
+        const specialAttackDamage = Math.round(
+          actor.stats.attack.current * 1.5
+        );
+
+        if (specialAttackDamage > dodgeThreshold) {
+          newRecipient.stats.hp.current = Math.max(
+            newRecipient.stats.hp.current - specialAttackDamage,
+            0
+          );
+          message.push(`It did ${specialAttackDamage} damage.`);
+        } else {
+          message.push(`It was dodged and did no damage.`);
+        }
+
+        updateCombatant(newRecipient);
+        break;
+    }
+    const log = [...eventLog, message].flat();
+    setEventLog(log);
+  }
+
+  console.log(eventLog);
+  const eventLogMarkup = eventLog.map((message, i) => (
+    <Text key={i}>{message}</Text>
+  ));
 
   return (
     <Pane
@@ -47,7 +152,13 @@ export function Page() {
       <Pane display="flex" flexDirection="column" alignItems="center">
         <Pane display="flex">
           <CombatantUI combatant={combatant1} />
-          <Pane padding={128} />
+          <Pane padding={128}>
+            {eventLog && (
+              <Card background="tint2" padding={8} elevation={3}>
+                {eventLogMarkup}
+              </Card>
+            )}
+          </Pane>
           <CombatantUI combatant={combatant2} />
         </Pane>
         <Pane padding={8} />
@@ -57,6 +168,16 @@ export function Page() {
       </Pane>
     </Pane>
   );
+}
+
+function computeSpeedArray(combatant: Combatant) {
+  const spd = new Array(combatant.stats.stamina.max);
+  spd.fill(combatant.stats.speed.max);
+  return spd.map((v, i) => ({
+    combatant: combatant.id,
+    speed: v * (1 - i / spd.length),
+    color: combatant.color,
+  }));
 }
 
 function generateEnemyActions(enemy: Combatant) {

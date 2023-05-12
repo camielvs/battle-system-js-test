@@ -1,5 +1,5 @@
 import { Button, Card, Heading, Pane } from "evergreen-ui";
-import { ACTIONS, Combatant, SKIPTURN } from "../../constants";
+import { ACTIONS, Action, Combatant, SKIPTURN } from "../../constants";
 import { useState } from "react";
 import { ActionButton } from "./Components";
 
@@ -39,7 +39,7 @@ export function ActionPanel({ combatant1, onConfirm }: Props) {
     return "yellow100";
   }
 
-  function updateActions(action: any) {
+  function updateActions(action: Action) {
     if (action && chosenActions.length < stamina - action.cost + 1) {
       const newActions = new Array(action.cost).fill(SKIPTURN);
       newActions[0] = action.name;

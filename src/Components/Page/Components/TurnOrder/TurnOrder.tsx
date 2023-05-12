@@ -1,9 +1,8 @@
 import { Badge, Card, Heading, Pane, Text } from "evergreen-ui";
-import type { Combatant } from "../../constants";
-import { useEffect, useMemo, useState } from "react";
+import { TurnOrderData } from "../../constants";
 
 interface Props {
-  turnOrder: any[];
+  turnOrder: TurnOrderData[];
 }
 
 export function TurnOrder({ turnOrder }: Props) {
