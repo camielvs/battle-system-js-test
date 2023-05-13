@@ -148,3 +148,8 @@ export type TurnOrderData = {
   speed: number;
   color: BadgeOwnProps["color"];
 };
+
+export type Event = {
+  message: string;
+  color: BadgeOwnProps["color"];
+};

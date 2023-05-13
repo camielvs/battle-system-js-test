@@ -1,13 +1,7 @@
-import { Card, Pane, Text } from "evergreen-ui";
+import { Pane } from "evergreen-ui";
 import { ActionPanel, CombatantUI, EventLog, TurnOrder } from "./Components";
-import {
-  Action,
-  ACTIONS,
-  combatant1Base,
-  combatant2Base,
-  SKIPTURN,
-} from "./constants";
-import type { Combatant, TurnOrderData } from "./constants";
+import { ACTIONS, combatant1Base, combatant2Base, SKIPTURN } from "./constants";
+import type { Combatant, Event, TurnOrderData } from "./constants";
 import { useMemo, useState } from "react";
 
 export function Page() {
@@ -15,7 +9,9 @@ export function Page() {
   const [combatant2, setCombatant2] = useState(combatant2Base);
   const [turnOrder, setTurnOrder] = useState([] as TurnOrderData[]);
   const [forceRefresh, setForceRefresh] = useState(false); //because I'm lazy
-  const [eventLog, setEventLog] = useState([""]);
+  const [eventLog, setEventLog] = useState([] as Event[]);
+  const [roundLog, setRoundLog] = useState([] as Event[]);
+  const [round, setRound] = useState(1);
 
   useMemo(() => {
     const c1spd = computeSpeedArray(combatant1);
@@ -26,33 +22,41 @@ export function Page() {
   }, [setTurnOrder]);
 
   function endRound(actions: string[]) {
-    updateLog("+--NEW ROUND--+");
+    updateRoundLog({ message: `+--ROUND ${round}--+`, color: "neutral" });
 
     const enemyActions = generateEnemyActions(combatant2);
 
-    console.log(turnOrder);
+    turnOrder.forEach((turn, i) => {
+      const turnNumber =
+        turn.combatant === "1"
+          ? turnOrder.slice(0, i).filter((v) => v.combatant === "1").length
+          : turnOrder.slice(0, i).filter((v) => v.combatant === "2").length;
 
-    turnOrder.forEach((turn) => {
-      // setTimeout(() => {
-      //timeout doesn't work?
-      executeAction(turn, actions, enemyActions);
+      const actionArray = turn.combatant === "1" ? actions : enemyActions;
+
+      const action = actionArray[turnNumber];
+
+      executeAction(turn, action);
       setForceRefresh(!forceRefresh);
-      updateLog(" ");
-      // }, 500);
     });
 
-    // console.log("+--NEW ROUND--+");
-    // setTimeout(() => {
+    updateRoundLog({ message: "\n", color: undefined });
+    prependRoundLogToEventLog();
+    setRoundLog([]);
+    setRound(round + 1);
     resetTempStats(combatant1);
     resetTempStats(combatant2);
     setForceRefresh(!forceRefresh);
-    // setEventLog("ROUND END");
-    // }, 500 * turnOrder.length);
   }
 
-  function updateLog(message: string) {
-    const tempLog = eventLog;
-    tempLog.push(message);
+  function updateRoundLog(event: Event) {
+    const tempLog = roundLog;
+    tempLog.push(event);
+    setRoundLog(tempLog);
+  }
+
+  function prependRoundLogToEventLog() {
+    const tempLog = roundLog.concat(eventLog);
     setEventLog(tempLog);
   }
 
@@ -71,16 +75,7 @@ export function Page() {
       : setCombatant2(combatantData);
   }
 
-  function executeAction(turn: any, actions: string[], enemyActions: string[]) {
-    const reversedActionArray = actions.reverse();
-    const reversedEnemyActionArray = enemyActions.reverse();
-
-    const actionArray =
-      turn.combatant === "1" ? reversedActionArray : reversedEnemyActionArray;
-    const action = actionArray.pop();
-
-    console.log(`executing action for player ${turn.combatant}:`, action);
-
+  function executeAction(turn: any, action: string) {
     if (action === SKIPTURN) return;
 
     const actor = turn.combatant === "1" ? combatant1 : combatant2;
@@ -96,22 +91,32 @@ export function Page() {
       0
     );
 
-    updateLog(`Player ${turn.combatant} used ${action}!`);
+    updateRoundLog({
+      message: `Player ${turn.combatant} used ${action}!`,
+      color: actor.color,
+    });
 
     switch (action?.toLowerCase()) {
       case "attack":
-        if (actor.stats.attack.current > dodgeThreshold && damage > 0) {
+        if (damage <= 0) {
+          updateRoundLog({
+            message: `> It was blocked and did no damage.`,
+            color: undefined,
+          });
+        } else if (actor.stats.attack.current <= dodgeThreshold) {
+          updateRoundLog({
+            message: `> It was dodged and did no damage.`,
+            color: undefined,
+          });
+        } else {
           newRecipient.stats.hp.current = Math.max(
             newRecipient.stats.hp.current - damage,
             0
           );
-          updateLog(`> It did ${damage} damage.`);
-        } else {
-          if (actor.stats.attack.current >= dodgeThreshold) {
-            updateLog(`> It was dodged and did no damage.`);
-          } else if (damage < 0) {
-            updateLog(`> It was blocked and did no damage.`);
-          }
+          updateRoundLog({
+            message: `> It did ${damage} damage.`,
+            color: undefined,
+          });
         }
 
         updateCombatant(newRecipient);
@@ -120,16 +125,20 @@ export function Page() {
       case "defend":
         actor.stats.defence.current += 5;
         updateCombatant(actor);
-        updateLog(`> Defence was increase by +5 until next action.`);
+        updateRoundLog({
+          message: `> Defence was increased by +5 until next action.`,
+          color: undefined,
+        });
         break;
 
       case "study":
         actor.stats.accuracy.current += 5;
         actor.stats.evasion.current += 5;
         updateCombatant(actor);
-        updateLog(
-          `> Accuracy and evasion were both increased by +5 for the remainder of this round.`
-        );
+        updateRoundLog({
+          message: `> Accuracy and evasion were both increased by +5 for the remainder of the round.`,
+          color: undefined,
+        });
         break;
 
       case "special attack":
@@ -142,21 +151,21 @@ export function Page() {
             newRecipient.stats.hp.current - specialAttackDamage,
             0
           );
-          updateLog(`> It did ${specialAttackDamage} damage.`);
+          updateRoundLog({
+            message: `> It did ${specialAttackDamage} damage.`,
+            color: undefined,
+          });
         } else {
-          updateLog(`> It was dodged and did no damage.`);
+          updateRoundLog({
+            message: `> It was dodged and did no damage.`,
+            color: undefined,
+          });
         }
 
         updateCombatant(newRecipient);
         break;
     }
   }
-
-  // console.log(eventLog); //event log currently isn't working. consider making a subcomponent
-  // const eventLogMarkup = eventLog.map(
-  //   (message, i) => console.log(message)
-  //   // <Text key={i}>{message}</Text>
-  // );
 
   return (
     <Pane
