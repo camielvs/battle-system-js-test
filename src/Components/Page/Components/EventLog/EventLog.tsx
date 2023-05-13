@@ -1,4 +1,4 @@
-import { Card, Heading, Pane, Strong, Text } from "evergreen-ui";
+import { Card, Heading, Strong, Text } from "evergreen-ui";
 import type { Event } from "../../constants";
 
 interface Props {

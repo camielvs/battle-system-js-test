@@ -9,14 +9,12 @@ import {
 } from "evergreen-ui";
 import type { Combatant } from "../../constants";
 import { HealthBar } from "./Components";
-import { useState } from "react";
 
 interface Props {
   combatant: Combatant;
   onRestart: () => void;
 }
 export function CombatantUI({ combatant, onRestart }: Props) {
-  console.log(combatant);
   const isP1 = combatant.id === "1";
   const { hp, attack, defence, speed, stamina, accuracy, evasion } =
     combatant.stats;

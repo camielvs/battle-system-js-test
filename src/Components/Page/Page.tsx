@@ -23,7 +23,7 @@ export function Page() {
 
   useMemo(() => {
     setTurnOrder(computeTurnOrder(combatant1, combatant2));
-  }, [setTurnOrder]);
+  }, [setTurnOrder, combatant1, combatant2]);
 
   function endRound(actions: string[]) {
     updateRoundLog({ message: `+--ROUND ${round}--+`, color: "neutral" });

@@ -136,6 +136,7 @@ export const ACTIONS = {
     cost: 2,
     weight: 2,
   },
+  //Add "strengthen action for 1 stamina that permanently increases your attack by 1 for the fight?"
 };
 
 export type Action = {
