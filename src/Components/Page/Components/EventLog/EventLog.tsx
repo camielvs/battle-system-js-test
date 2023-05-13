@@ -1,4 +1,4 @@
-import { Card, Heading, Pane, Text } from "evergreen-ui";
+import { Card, Heading, Pane, Strong, Text } from "evergreen-ui";
 import type { Event } from "../../constants";
 
 interface Props {
@@ -15,7 +15,11 @@ export function EventLog({ log }: Props) {
         padding={4}
         margin={4}
       >
-        <Text>{e.message}</Text>
+        {e.message.startsWith("+--") ? (
+          <Strong>{e.message}</Strong>
+        ) : (
+          <Text>{e.message}</Text>
+        )}
       </Card>
     )
   );
