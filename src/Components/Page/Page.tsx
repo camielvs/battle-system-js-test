@@ -4,25 +4,25 @@ import { combatant1Base, combatant2Base } from "./constants";
 import type { Combatant, Event, TurnOrderData } from "./constants";
 import { useMemo, useState } from "react";
 import {
-  computeSpeedArray,
+  computeTurnOrder,
   generateEnemyActions,
+  generateRandomCombatant,
   resolveTurns,
 } from "./utilities";
 
 export function Page() {
   const [combatant1, setCombatant1] = useState(combatant1Base);
-  const [combatant2, setCombatant2] = useState(combatant2Base);
+  const [combatant2, setCombatant2] = useState(
+    generateRandomCombatant(combatant2Base, combatant1.victories || 0)
+  );
   const [turnOrder, setTurnOrder] = useState([] as TurnOrderData[]);
   const [eventLog, setEventLog] = useState([] as Event[]);
   const [roundLog, setRoundLog] = useState([] as Event[]);
   const [round, setRound] = useState(1);
+  const [forceRefresh, setForceRefresh] = useState(false);
 
   useMemo(() => {
-    const c1spd = computeSpeedArray(combatant1);
-    const c2spd = computeSpeedArray(combatant2);
-
-    const turnOrder = c1spd.concat(c2spd).sort((a, b) => b.speed - a.speed);
-    setTurnOrder(turnOrder);
+    setTurnOrder(computeTurnOrder(combatant1, combatant2));
   }, [setTurnOrder]);
 
   function endRound(actions: string[]) {
@@ -36,6 +36,24 @@ export function Page() {
       updateCombatant,
       updateRoundLog
     );
+
+    if (combatant1.stats.hp.current <= 0) {
+      updateRoundLog({
+        message: `${combatant1.name} was defeated`,
+        color: "yellow",
+      });
+    }
+    if (combatant2.stats.hp.current <= 0) {
+      updateRoundLog({
+        message: `${combatant2.name} was defeated`,
+        color: "yellow",
+      });
+      const tempCombatant = combatant1;
+      if (tempCombatant.victories !== undefined) {
+        tempCombatant.victories += 1;
+        updateCombatant(tempCombatant);
+      }
+    }
 
     updateRoundLog({ message: "\n", color: undefined });
     prependRoundLogToEventLog();
@@ -71,6 +89,28 @@ export function Page() {
       : setCombatant2(combatantData);
   }
 
+  function onRestart() {
+    const newEnemy = generateRandomCombatant(
+      combatant2Base,
+      combatant1.victories || 0
+    );
+    setCombatant2(newEnemy);
+    setTurnOrder(computeTurnOrder(combatant1, newEnemy));
+    setEventLog([]);
+    setRoundLog([]);
+    setRound(1);
+    forcePageRefresh();
+  }
+
+  function respawnPlayer() {
+    setCombatant1(combatant1Base);
+    onRestart();
+  }
+
+  function forcePageRefresh() {
+    setForceRefresh(!forceRefresh);
+  }
+
   return (
     <Pane
       height="100vh"
@@ -84,14 +124,20 @@ export function Page() {
     >
       <Pane display="flex" flexDirection="column" alignItems="center">
         <Pane display="flex">
-          <CombatantUI combatant={combatant1} />
+          <CombatantUI combatant={combatant1} onRestart={respawnPlayer} />
           <Pane padding={128} />
-          <CombatantUI combatant={combatant2} />
+          <CombatantUI combatant={combatant2} onRestart={onRestart} />
         </Pane>
         <Pane padding={8} />
         <TurnOrder turnOrder={turnOrder} />
         <Pane padding={8} />
-        <ActionPanel combatant1={combatant1} onConfirm={endRound} />
+        <ActionPanel
+          combatant1={combatant1}
+          isFightOver={
+            combatant1.stats.hp.current <= 0 || combatant2.stats.hp.current <= 0
+          }
+          onConfirm={endRound}
+        />
         <Pane padding={8} />
         <EventLog log={eventLog} />
         <Pane padding={8} />

@@ -5,10 +5,11 @@ import { ActionButton } from "./Components";
 
 interface Props {
   combatant1: Combatant;
+  isFightOver: boolean;
   onConfirm: (actions: string[]) => void;
 }
 
-export function ActionPanel({ combatant1, onConfirm }: Props) {
+export function ActionPanel({ combatant1, isFightOver, onConfirm }: Props) {
   const [chosenActions, setChosenActions] = useState([] as string[]);
 
   const stamina = combatant1.stats.stamina.max;
@@ -52,7 +53,9 @@ export function ActionPanel({ combatant1, onConfirm }: Props) {
     return (
       <ActionButton
         action={action}
-        disabled={chosenActions.length >= stamina - action.cost + 1}
+        disabled={
+          chosenActions.length >= stamina - action.cost + 1 || isFightOver
+        }
         onClick={() => updateActions(action)}
         key={action.name}
       />
@@ -80,12 +83,16 @@ export function ActionPanel({ combatant1, onConfirm }: Props) {
             onConfirm(chosenActions);
             setChosenActions([]);
           }}
-          disabled={chosenActions.length !== stamina}
+          disabled={chosenActions.length !== stamina || isFightOver}
         >
           Confirm
         </Button>
         <Pane margin={8} />
-        <Button appearance="destructive" onClick={() => setChosenActions([])}>
+        <Button
+          intent="danger"
+          disabled={isFightOver}
+          onClick={() => setChosenActions([])}
+        >
           Clear
         </Button>
       </Pane>

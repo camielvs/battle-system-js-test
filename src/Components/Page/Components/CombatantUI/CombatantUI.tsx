@@ -1,14 +1,49 @@
-import { Avatar, Card, Heading, Pane, Strong, Text } from "evergreen-ui";
+import {
+  Avatar,
+  Button,
+  Card,
+  Heading,
+  Pane,
+  Strong,
+  Text,
+} from "evergreen-ui";
 import type { Combatant } from "../../constants";
 import { HealthBar } from "./Components";
 import { useState } from "react";
 
 interface Props {
   combatant: Combatant;
+  onRestart: () => void;
 }
-export function CombatantUI({ combatant }: Props) {
-  const [stats, setStats] = useState(combatant.stats);
-  const { hp, attack, defence, speed, stamina, accuracy, evasion } = stats;
+export function CombatantUI({ combatant, onRestart }: Props) {
+  console.log(combatant);
+  const isP1 = combatant.id === "1";
+  const { hp, attack, defence, speed, stamina, accuracy, evasion } =
+    combatant.stats;
+  const nameTag =
+    hp.current <= 0 ? (
+      <del>
+        <Heading>{combatant.name}</Heading>
+      </del>
+    ) : (
+      <Heading>{combatant.name}</Heading>
+    );
+  const victoriesUI = (
+    <Pane>
+      <Pane marginY={4} border="muted" />
+      <Text>{`Victories: ${combatant.victories}`}</Text>
+    </Pane>
+  );
+  const restartButton = (
+    <Pane>
+      <Pane marginY={4} border="muted" />
+      <Pane display="flex" justifyContent="center">
+        <Button appearance="primary" intent="success" onClick={onRestart}>
+          {isP1 ? `Restart` : "Next Fight"}
+        </Button>
+      </Pane>
+    </Pane>
+  );
   return (
     <Pane display="flex" flexDirection="column" alignItems="center" margin={16}>
       <Avatar name={combatant.name} size={210} color={combatant.color} />
@@ -20,7 +55,7 @@ export function CombatantUI({ combatant }: Props) {
         elevation={1}
         justifyContent="center"
       >
-        <Heading>{combatant.name}</Heading>
+        {nameTag}
       </Card>
       <Card
         display="flex"
@@ -39,6 +74,8 @@ export function CombatantUI({ combatant }: Props) {
         <Text>{`Stamina: ${stamina.current}`}</Text>
         <Text>{`Accuracy: ${accuracy.current}`}</Text>
         <Text>{`Evasion: ${evasion.current}`}</Text>
+        {isP1 ? victoriesUI : null}
+        {combatant.stats.hp.current <= 0 ? restartButton : null}
       </Card>
     </Pane>
   );

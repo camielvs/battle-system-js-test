@@ -7,7 +7,7 @@ interface Props {
 export function EventLog({ log }: Props) {
   const logMarkup = log.map((e, i) =>
     e.message === "\n" ? (
-      <br />
+      <br key={i} />
     ) : (
       <Card
         key={i}

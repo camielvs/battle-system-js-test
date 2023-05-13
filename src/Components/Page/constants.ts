@@ -4,6 +4,7 @@ export type Combatant = {
   name: string;
   id: string;
   color: BadgeOwnProps["color"];
+  victories?: number;
   stats: {
     hp: {
       max: number;
@@ -40,6 +41,7 @@ export const combatant1Base: Combatant = {
   name: "Player 1",
   id: "1",
   color: "blue",
+  victories: 0,
   stats: {
     hp: {
       max: 100,
@@ -145,6 +147,7 @@ export type Action = {
 
 export type TurnOrderData = {
   combatant: string;
+  name: string;
   speed: number;
   color: BadgeOwnProps["color"];
 };

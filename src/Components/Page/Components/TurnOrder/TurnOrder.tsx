@@ -6,11 +6,16 @@ interface Props {
 }
 
 export function TurnOrder({ turnOrder }: Props) {
-  const turnOrderMarkup = turnOrder.map((spd, i) => (
-    <Badge color={spd.color} margin={8} key={`${i}-P${spd.combatant}`}>
-      <Text>{`P${spd.combatant}`}</Text>
-    </Badge>
-  ));
+  const turnOrderMarkup = turnOrder.map((spd, i) => {
+    const name = spd.name.toUpperCase().split(" ");
+    const tag = name.length === 1 ? name[0][0] : name[0][0] + name[1][0];
+
+    return (
+      <Badge color={spd.color} margin={8} key={`${i}-${tag}`}>
+        <Text>{tag}</Text>
+      </Badge>
+    );
+  });
 
   return (
     <Card

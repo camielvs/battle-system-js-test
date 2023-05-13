@@ -1,13 +1,22 @@
 import { ACTIONS, SKIPTURN } from "./constants";
 import type { Combatant, Event } from "./constants";
 
-export function computeSpeedArray(combatant: Combatant) {
+const randomWords = require("random-words");
+
+export function computeTurnOrder(combatant1: Combatant, combatant2: Combatant) {
+  const c1spd = computeSpeedArray(combatant1);
+  const c2spd = computeSpeedArray(combatant2);
+  return c1spd.concat(c2spd).sort((a, b) => b.speed - a.speed);
+}
+
+function computeSpeedArray(combatant: Combatant) {
   const spd = new Array(combatant.stats.stamina.max);
   spd.fill(combatant.stats.speed.max);
   return spd.map((v, i) => ({
     combatant: combatant.id,
     speed: v * (1 - i / spd.length),
     color: combatant.color,
+    name: combatant.name,
   }));
 }
 
@@ -77,6 +86,8 @@ function executeAction(
   const actor = turn.combatant === "1" ? combatants[0] : combatants[1];
   const recipient = actor.id === "1" ? combatants[1] : combatants[0];
 
+  if (actor.stats.hp.current <= 0 || recipient.stats.hp.current <= 0) return;
+
   actor.stats.defence.current = actor.stats.defence.max;
   updateCombatant(actor);
 
@@ -88,7 +99,7 @@ function executeAction(
   );
 
   updateRoundLog({
-    message: `Player ${turn.combatant} used ${action}!`,
+    message: `${actor.name} used ${action}!`,
     color: actor.color,
   });
 
@@ -159,4 +170,51 @@ function executeAction(
       updateCombatant(newRecipient);
       break;
   }
+}
+
+export function generateRandomCombatant(base: Combatant, victories: number) {
+  const difficultyFactor = 1 + (victories - 1) / 10;
+  const name = randomWords({ exactly: 2, join: " " });
+  const hp = Math.floor(Math.random() * 40 * difficultyFactor) + 80;
+  const attack = Math.floor(Math.random() * 5 * difficultyFactor) + 2;
+  const defence = Math.floor(Math.random() * 8 * difficultyFactor) + 0;
+  const speed = Math.floor(Math.random() * 60 * difficultyFactor) + 50;
+  const stamina = Math.floor(Math.random() * 3 * difficultyFactor) + 2;
+  const accuracy = Math.floor(Math.random() * 5 * difficultyFactor) + 5;
+  const evasion = Math.floor(Math.random() * 8 * difficultyFactor) + 2;
+
+  return {
+    ...base,
+    name: name.charAt(0).toUpperCase() + name.slice(1),
+    stats: {
+      hp: {
+        current: hp,
+        max: hp,
+      },
+      attack: {
+        current: attack,
+        max: attack,
+      },
+      defence: {
+        current: defence,
+        max: defence,
+      },
+      speed: {
+        current: speed,
+        max: speed,
+      },
+      stamina: {
+        current: stamina,
+        max: stamina,
+      },
+      accuracy: {
+        current: accuracy,
+        max: accuracy,
+      },
+      evasion: {
+        current: evasion,
+        max: evasion,
+      },
+    },
+  };
 }
