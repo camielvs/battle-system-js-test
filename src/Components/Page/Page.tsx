@@ -1,5 +1,5 @@
 import { Card, Pane, Text } from "evergreen-ui";
-import { ActionPanel, CombatantUI, TurnOrder } from "./Components";
+import { ActionPanel, CombatantUI, EventLog, TurnOrder } from "./Components";
 import {
   Action,
   ACTIONS,
@@ -15,7 +15,7 @@ export function Page() {
   const [combatant2, setCombatant2] = useState(combatant2Base);
   const [turnOrder, setTurnOrder] = useState([] as TurnOrderData[]);
   const [forceRefresh, setForceRefresh] = useState(false); //because I'm lazy
-  const [eventLog, setEventLog] = useState([] as string[]);
+  const [eventLog, setEventLog] = useState([""]);
 
   useMemo(() => {
     const c1spd = computeSpeedArray(combatant1);
@@ -26,22 +26,34 @@ export function Page() {
   }, [setTurnOrder]);
 
   function endRound(actions: string[]) {
+    updateLog("+--NEW ROUND--+");
+
     const enemyActions = generateEnemyActions(combatant2);
 
+    console.log(turnOrder);
+
     turnOrder.forEach((turn) => {
-      setTimeout(() => {
-        executeAction(turn, actions, enemyActions);
-        setForceRefresh(!forceRefresh);
-      }, 500);
+      // setTimeout(() => {
+      //timeout doesn't work?
+      executeAction(turn, actions, enemyActions);
+      setForceRefresh(!forceRefresh);
+      updateLog(" ");
+      // }, 500);
     });
 
     // console.log("+--NEW ROUND--+");
-    setTimeout(() => {
-      resetTempStats(combatant1);
-      resetTempStats(combatant2);
-      setForceRefresh(!forceRefresh);
-      // setEventLog("ROUND END");
-    }, 500 * turnOrder.length);
+    // setTimeout(() => {
+    resetTempStats(combatant1);
+    resetTempStats(combatant2);
+    setForceRefresh(!forceRefresh);
+    // setEventLog("ROUND END");
+    // }, 500 * turnOrder.length);
+  }
+
+  function updateLog(message: string) {
+    const tempLog = eventLog;
+    tempLog.push(message);
+    setEventLog(tempLog);
   }
 
   function resetTempStats(combatant: Combatant) {
@@ -67,6 +79,8 @@ export function Page() {
       turn.combatant === "1" ? reversedActionArray : reversedEnemyActionArray;
     const action = actionArray.pop();
 
+    console.log(`executing action for player ${turn.combatant}:`, action);
+
     if (action === SKIPTURN) return;
 
     const actor = turn.combatant === "1" ? combatant1 : combatant2;
@@ -82,8 +96,7 @@ export function Page() {
       0
     );
 
-    const message = [];
-    message.push(`Player ${turn.combatant} used ${action}!`);
+    updateLog(`Player ${turn.combatant} used ${action}!`);
 
     switch (action?.toLowerCase()) {
       case "attack":
@@ -92,9 +105,13 @@ export function Page() {
             newRecipient.stats.hp.current - damage,
             0
           );
-          message.push(`It did ${damage} damage.`);
+          updateLog(`> It did ${damage} damage.`);
         } else {
-          message.push(`It was dodged or blocked and did no damage.`);
+          if (actor.stats.attack.current >= dodgeThreshold) {
+            updateLog(`> It was dodged and did no damage.`);
+          } else if (damage < 0) {
+            updateLog(`> It was blocked and did no damage.`);
+          }
         }
 
         updateCombatant(newRecipient);
@@ -103,12 +120,16 @@ export function Page() {
       case "defend":
         actor.stats.defence.current += 5;
         updateCombatant(actor);
+        updateLog(`> Defence was increase by +5 until next action.`);
         break;
 
       case "study":
         actor.stats.accuracy.current += 5;
         actor.stats.evasion.current += 5;
         updateCombatant(actor);
+        updateLog(
+          `> Accuracy and evasion were both increased by +5 for the remainder of this round.`
+        );
         break;
 
       case "special attack":
@@ -121,22 +142,21 @@ export function Page() {
             newRecipient.stats.hp.current - specialAttackDamage,
             0
           );
-          message.push(`It did ${specialAttackDamage} damage.`);
+          updateLog(`> It did ${specialAttackDamage} damage.`);
         } else {
-          message.push(`It was dodged and did no damage.`);
+          updateLog(`> It was dodged and did no damage.`);
         }
 
         updateCombatant(newRecipient);
         break;
     }
-    const log = [...eventLog, message].flat();
-    setEventLog(log);
   }
 
-  console.log(eventLog);
-  const eventLogMarkup = eventLog.map((message, i) => (
-    <Text key={i}>{message}</Text>
-  ));
+  // console.log(eventLog); //event log currently isn't working. consider making a subcomponent
+  // const eventLogMarkup = eventLog.map(
+  //   (message, i) => console.log(message)
+  //   // <Text key={i}>{message}</Text>
+  // );
 
   return (
     <Pane
@@ -152,19 +172,16 @@ export function Page() {
       <Pane display="flex" flexDirection="column" alignItems="center">
         <Pane display="flex">
           <CombatantUI combatant={combatant1} />
-          <Pane padding={128}>
-            {eventLog && (
-              <Card background="tint2" padding={8} elevation={3}>
-                {eventLogMarkup}
-              </Card>
-            )}
-          </Pane>
+          <Pane padding={128} />
           <CombatantUI combatant={combatant2} />
         </Pane>
         <Pane padding={8} />
         <TurnOrder turnOrder={turnOrder} />
         <Pane padding={8} />
         <ActionPanel combatant1={combatant1} onConfirm={endRound} />
+        <Pane padding={8} />
+        <EventLog log={eventLog} />
+        <Pane padding={8} />
       </Pane>
     </Pane>
   );

@@ -70,7 +70,7 @@ export function ActionPanel({ combatant1, onConfirm }: Props) {
       <Pane display="flex" justifyContent="center">
         {staminaMarkup}
       </Pane>
-      <Heading padding={8}>Choose your actions for this round</Heading>
+      <Heading margin={8}>Choose your actions for this round</Heading>
       <Pane justifyContent="center">{buttons}</Pane>
       <Pane margin={8} />
       <Pane display="flex" justifyContent="center">
