@@ -92,11 +92,15 @@ function executeAction(
   updateCombatant(actor);
 
   const newRecipient = recipient;
-  const damage = actor.stats.attack.current - recipient.stats.defence.current;
   const dodgeThreshold = Math.max(
     recipient.stats.evasion.current - actor.stats.accuracy.current,
     0
   );
+
+  const damage =
+    actor.stats.attack.current -
+    recipient.stats.defence.current -
+    Math.floor(dodgeThreshold / 2);
 
   updateRoundLog({
     message: `${actor.name} used ${action}!`,
@@ -149,7 +153,7 @@ function executeAction(
       break;
 
     case "special attack":
-      const specialAttackDamage = Math.round(actor.stats.attack.current * 1.5);
+      const specialAttackDamage = Math.floor(actor.stats.attack.current * 1.5);
 
       if (specialAttackDamage > dodgeThreshold) {
         newRecipient.stats.hp.current = Math.max(
@@ -178,10 +182,10 @@ export function generateRandomCombatant(base: Combatant, victories: number) {
   const hp = Math.floor(Math.random() * 40 * difficultyFactor) + 80;
   const attack = Math.floor(Math.random() * 5 * difficultyFactor) + 2;
   const defence = Math.floor(Math.random() * 8 * difficultyFactor) + 0;
-  const speed = Math.floor(Math.random() * 60 * difficultyFactor) + 50;
-  const stamina = Math.floor(Math.random() * 3 * difficultyFactor) + 2;
-  const accuracy = Math.floor(Math.random() * 5 * difficultyFactor) + 5;
-  const evasion = Math.floor(Math.random() * 8 * difficultyFactor) + 2;
+  const speed = Math.floor(Math.random() * 100 * difficultyFactor) + 50;
+  const stamina = Math.floor(Math.random() * 4 * difficultyFactor) + 2;
+  const accuracy = Math.floor(Math.random() * 5 * difficultyFactor) + 1;
+  const evasion = Math.floor(Math.random() * 5 * difficultyFactor) + 1;
 
   return {
     ...base,

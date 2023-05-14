@@ -64,12 +64,12 @@ export const combatant1Base: Combatant = {
       current: 5,
     },
     accuracy: {
-      max: 8,
-      current: 8,
+      max: 3,
+      current: 3,
     },
     evasion: {
-      max: 5,
-      current: 5,
+      max: 2,
+      current: 2,
     },
   },
 };

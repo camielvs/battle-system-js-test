@@ -19,14 +19,13 @@ export function Page() {
   const [eventLog, setEventLog] = useState([] as Event[]);
   const [roundLog, setRoundLog] = useState([] as Event[]);
   const [round, setRound] = useState(1);
-  const [forceRefresh, setForceRefresh] = useState(false);
 
   useMemo(() => {
     setTurnOrder(computeTurnOrder(combatant1, combatant2));
   }, [setTurnOrder, combatant1, combatant2]);
 
   function endRound(actions: string[]) {
-    updateRoundLog({ message: `+--ROUND ${round}--+`, color: "neutral" });
+    updateRoundLog({ message: `+--ROUND ${round}--+`, color: undefined });
 
     const enemyActions = generateEnemyActions(combatant2);
     resolveTurns(
@@ -39,13 +38,13 @@ export function Page() {
 
     if (combatant1.stats.hp.current <= 0) {
       updateRoundLog({
-        message: `${combatant1.name} was defeated`,
+        message: `${combatant1.name} was defeated.`,
         color: "yellow",
       });
     }
     if (combatant2.stats.hp.current <= 0) {
       updateRoundLog({
-        message: `${combatant2.name} was defeated`,
+        message: `${combatant2.name} was defeated.`,
         color: "yellow",
       });
       const tempCombatant = combatant1;
@@ -99,16 +98,11 @@ export function Page() {
     setEventLog([]);
     setRoundLog([]);
     setRound(1);
-    forcePageRefresh();
   }
 
   function respawnPlayer() {
     setCombatant1(combatant1Base);
     onRestart();
-  }
-
-  function forcePageRefresh() {
-    setForceRefresh(!forceRefresh);
   }
 
   return (
